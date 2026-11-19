@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock %}
+{% block content %}
+{% if empleado %}
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="card card-body text-center h-100">
+      <p class="text-secondary mb-1">{% now "l d \d\e F \d\e Y" %}</p>
+      <div class="reloj" id="reloj">{% now "H:i" %}</div>
+      <p class="small text-secondary">Horario: {{ empleado.hora_entrada|time:"H:i" }} a {{ empleado.hora_salida|time:"H:i" }}</p>
+      <form method="post" action="{% url 'marcar_asistencia' %}" class="d-flex gap-2 justify-content-center">
+        {% csrf_token %}
+        <button name="tipo" value="entrada" class="btn btn-lg btn-success" {% if entrada_abierta %}disabled{% endif %}>
+          <i class="bi bi-box-arrow-in-right"></i> Marcar entrada
+        </button>
+        <button name="tipo" value="salida" class="btn btn-lg btn-outline-danger" {% if not entrada_abierta %}disabled{% endif %}>
+          <i class="bi bi-box-arrow-right"></i> Marcar salida
+        </button>
+      </form>
+      <hr>
+      <p class="small fw-semibold mb-1">Hoy</p>
+      {% for r in registros_hoy %}
+        <p class="small mb-0">Entrada {{ r.hora_entrada|time:"H:i" }} &middot; Salida {{ r.hora_salida|time:"H:i"|default:"pendiente" }}
+          {% if r.horas_trabajadas %}&middot; {{ r.horas_trabajadas }} h{% endif %}</p>
+      {% empty %}
+        <p class="small text-secondary mb-0">Sin marcaciones todavía.</p>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card card-body mb-3">
+      <h1 class="h4 mb-1">{{ empleado.nombre_completo }}</h1>
+      <p class="text-secondary mb-2">{{ empleado.cargo }} &middot; {{ empleado.area }} &middot; {{ empleado.get_tipo_contrato_display }}</p>
+      <div class="row text-center">
+        <div class="col"><div class="fs-4 fw-bold">{{ empleado.dias_vacaciones_disponibles }}</div><div class="small text-secondary">días de vacaciones</div></div>
+        <div class="col"><div class="fs-6 fw-bold mt-2">{{ empleado.antiguedad }}</div><div class="small text-secondary">de antigüedad</div></div>
+        {% if pendientes_por_aprobar is not None %}
+          <div class="col"><a href="{% url 'permisos_pendientes' %}" class="text-decoration-none"><div class="fs-4 fw-bold">{{ pendientes_por_aprobar }}</div><div class="small text-secondary">permisos por aprobar</div></a></div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <span class="fw-semibold"><i class="bi bi-calendar2-check"></i> Mis últimas solicitudes</span>
+        {% if perms.rrhh.solicitar_permiso %}<a href="{% url 'permiso_nuevo' %}" class="btn btn-sm btn-primary"><i class="bi bi-plus"></i> Solicitar permiso</a>{% endif %}
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for p in mis_permisos %}
+          <li class="list-group-item d-flex justify-content-between small">
+            <span>{{ p.get_tipo_display }} &middot; {{ p.fecha_inicio|date:"d/m" }} al {{ p.fecha_fin|date:"d/m" }} ({{ p.dias }} día{{ p.dias|pluralize }})</span>
+            <span class="badge text-bg-{{ p.color_estado }}">{{ p.get_estado_display }}</span>
+          </li>
+        {% empty %}
+          <li class="list-group-item small text-secondary">Sin solicitudes.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+<script>
+  // Reloj en vivo (solo visual: la hora oficial la registra el servidor al enviar)
+  setInterval(() => {
+    const d = new Date();
+    document.getElementById("reloj").textContent = d.toLocaleTimeString("es-PE", {hour: "2-digit", minute: "2-digit"});
+  }, 1000);
+</script>
+{% else %}
+  <div class="card card-body">
+    <h1 class="h4">Bienvenido(a)</h1>
+    <p class="text-secondary mb-0">Tu usuario no está vinculado a un empleado. Usa el menú para acceder a reportes o al panel de administración.</p>
+  </div>
+{% endif %}
+{% endblock %}
