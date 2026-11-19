@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Eliminar equipo{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card card-body">
+      <h1 class="h4 text-danger"><i class="bi bi-trash"></i> Eliminar equipo</h1>
+      <p>¿Seguro que deseas eliminar <strong>{{ equipo.codigo_patrimonial }} - {{ equipo.nombre }}</strong>
+         ({{ equipo.laboratorio.nombre }})? Esta acción no se puede deshacer.</p>
+      <form method="post" class="d-flex gap-2">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Sí, eliminar</button>
+        <a href="{% url 'catalogo' %}" class="btn btn-outline-secondary">Cancelar</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

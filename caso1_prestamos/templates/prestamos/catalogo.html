@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Catálogo de equipos{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <h1 class="h3 mb-1"><i class="bi bi-grid-3x3-gap"></i> Catálogo de equipos</h1>
+    <p class="text-secondary mb-0">{{ equipos|length }} equipo{{ equipos|length|pluralize }} en los laboratorios de la FIS</p>
+  </div>
+  {% if not user.is_authenticated %}
+    <span class="badge text-bg-light border"><i class="bi bi-eye"></i> Modo invitado: solo lectura</span>
+  {% endif %}
+</div>
+
+<form method="get" class="card card-body mb-4">
+  <div class="row g-2">
+    <div class="col-md-5">
+      <input type="text" name="q" value="{{ filtros.q }}" class="form-control" placeholder="Buscar por código, nombre o categoría">
+    </div>
+    <div class="col-md-3">
+      <select name="laboratorio" class="form-select">
+        <option value="">Todos los laboratorios</option>
+        {% for lab in laboratorios %}
+          <option value="{{ lab.pk }}" {% if filtros.laboratorio == lab.pk|stringformat:"s" %}selected{% endif %}>{{ lab.nombre }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="estado" class="form-select">
+        <option value="">Todos los estados</option>
+        {% for valor, etiqueta in estados %}
+          <option value="{{ valor }}" {% if filtros.estado == valor %}selected{% endif %}>{{ etiqueta }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2 d-grid">
+      <button class="btn btn-primary"><i class="bi bi-search"></i> Filtrar</button>
+    </div>
+  </div>
+</form>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Código</th><th>Equipo</th><th>Categoría</th><th>Laboratorio</th>
+          <th>Estado</th><th class="text-center">Disponibles</th><th>Mantenimiento</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in equipos %}
+          <tr>
+            <td class="font-monospace">{{ e.codigo_patrimonial }}</td>
+            <td><strong>{{ e.nombre }}</strong><div class="small text-secondary">{{ e.marca }} {{ e.modelo }}</div></td>
+            <td>{{ e.get_categoria_display }}</td>
+            <td class="small">{{ e.laboratorio.nombre }}</td>
+            <td><span class="badge text-bg-{{ e.color_estado }}">{{ e.get_estado_display }}</span></td>
+            <td class="text-center">
+              {% if e.unidades_disponibles == 0 %}
+                <span class="badge text-bg-danger">0 / {{ e.cantidad_total }}</span>
+              {% else %}
+                {{ e.unidades_disponibles }} / {{ e.cantidad_total }}
+              {% endif %}
+            </td>
+            <td class="small">
+              {% if e.dias_desde_mantenimiento is None %}Sin registro
+              {% elif e.dias_desde_mantenimiento > 180 %}<span class="text-danger"><i class="bi bi-exclamation-triangle"></i> hace {{ e.dias_desde_mantenimiento }} días</span>
+              {% else %}hace {{ e.dias_desde_mantenimiento }} días{% endif %}
+            </td>
+            <td class="text-end">
+              {% if perms.prestamos.delete_equipo %}
+                <a href="{% url 'equipo_eliminar' e.pk %}" class="btn btn-sm btn-outline-danger" title="Eliminar"><i class="bi bi-trash"></i></a>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="8" class="text-center text-secondary py-4"><i class="bi bi-inbox fs-3 d-block"></i>No se encontraron equipos.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
