@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Registrar devolución{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <h1 class="h3 mb-3"><i class="bi bi-box-arrow-in-down"></i> Registrar devolución</h1>
+
+    <div class="card card-body mb-3">
+      <div class="row small">
+        <div class="col-sm-6"><span class="text-secondary">Préstamo</span><br><strong>#{{ prestamo.pk }}</strong></div>
+        <div class="col-sm-6"><span class="text-secondary">Docente</span><br><strong>{{ prestamo.docente.get_full_name|default:prestamo.docente.username }}</strong></div>
+        <div class="col-sm-6 mt-2"><span class="text-secondary">Equipo</span><br>{{ prestamo.cantidad }} x {{ prestamo.equipo.nombre }} ({{ prestamo.equipo.codigo_patrimonial }})</div>
+        <div class="col-sm-6 mt-2"><span class="text-secondary">Plazo</span><br>{{ prestamo.fecha_prestamo|date:"d/m/Y" }} al {{ prestamo.fecha_devolucion_prevista|date:"d/m/Y" }}
+          {% if prestamo.esta_vencido %}<span class="badge text-bg-danger">{{ prestamo.dias_retraso }} días de retraso</span>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <form method="post" class="card card-body" novalidate>
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-md-6">{% include "prestamos/_campo.html" with campo=form.fecha_devolucion %}</div>
+        <div class="col-md-6">{% include "prestamos/_campo.html" with campo=form.estado_retorno %}</div>
+      </div>
+      {% include "prestamos/_campo.html" with campo=form.observaciones %}
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check2-circle"></i> Confirmar devolución</button>
+        <a href="{% url 'prestamo_lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Historial clínico{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <h1 class="h3 mb-1"><i class="bi bi-file-medical"></i> Historial clínico</h1>
+    <p class="text-secondary mb-0">{{ paciente.nombre_completo }} &middot; DNI {{ paciente.dni }} &middot; {{ paciente.edad }} años &middot; {{ paciente.get_tipo_display }}</p>
+  </div>
+  <span class="badge text-bg-warning"><i class="bi bi-eye"></i> Acceso registrado en la auditoría</span>
+</div>
+{% if paciente.alergias %}<div class="alert alert-danger py-2"><i class="bi bi-exclamation-triangle"></i> Alergias: {{ paciente.alergias }}</div>{% endif %}
+
+{% for c in consultas %}
+  <div class="card mb-3">
+    <div class="card-header bg-white d-flex justify-content-between flex-wrap">
+      <span><i class="bi bi-calendar-check"></i> {{ c.cita.fecha_hora|date:"d/m/Y H:i" }} &middot; Dr(a). {{ c.cita.medico.apellidos }} ({{ c.cita.medico.get_especialidad_display }})</span>
+      <span class="badge text-bg-light border"><i class="bi bi-lock"></i> Solo lectura</span>
+    </div>
+    <div class="card-body">
+      <dl class="row mb-0 small">
+        <dt class="col-sm-3">Diagnóstico</dt><dd class="col-sm-9">{{ c.diagnostico }}</dd>
+        <dt class="col-sm-3">Tratamiento</dt><dd class="col-sm-9">{{ c.tratamiento }}</dd>
+        <dt class="col-sm-3">Medicamentos</dt><dd class="col-sm-9">{{ c.medicamentos|default:"Ninguno" }}</dd>
+        <dt class="col-sm-3">Adjuntos</dt><dd class="col-sm-9">{{ c.archivos_adjuntos|default:"-" }}</dd>
+        <dt class="col-sm-3">Próximo control</dt><dd class="col-sm-9">{{ c.proxima_cita|date:"d/m/Y"|default:"No programado" }}</dd>
+      </dl>
+      {% if c.notas.all %}
+        <hr><p class="small fw-semibold mb-1"><i class="bi bi-journal-plus"></i> Notas</p>
+        {% for n in c.notas.all %}<p class="small mb-1">{{ n.creado_en|date:"d/m/Y H:i" }} &middot; {{ n.autor.get_full_name }}: {{ n.texto }}</p>{% endfor %}
+      {% endif %}
+      {% if nota_form %}
+        <form method="post" action="{% url 'nota_agregar' c.pk %}" class="mt-2 d-flex gap-2">
+          {% csrf_token %}
+          <input type="text" name="texto" class="form-control form-control-sm" placeholder="Agregar nota (mínimo 10 caracteres)">
+          <button class="btn btn-sm btn-outline-primary text-nowrap"><i class="bi bi-plus"></i> Nota</button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+{% empty %}
+  <div class="card card-body text-center text-secondary"><i class="bi bi-inbox fs-3"></i>Sin consultas registradas.</div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Corregir asistencia{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <h1 class="h3 mb-3"><i class="bi bi-pencil-square"></i> Corrección de asistencia</h1>
+    <div class="card card-body mb-3 small">
+      <strong>{{ asistencia.empleado.nombre_completo }}</strong> &middot; {{ asistencia.empleado.area }}<br>
+      Registro del {{ asistencia.fecha|date:"d/m/Y" }}: entrada {{ asistencia.hora_entrada|time:"H:i" }},
+      salida {{ asistencia.hora_salida|time:"H:i"|default:"sin marcar" }}
+    </div>
+    <form method="post" class="card card-body" novalidate>
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-md-6">{% include "rrhh/_campo.html" with campo=form.entrada_nueva %}</div>
+        <div class="col-md-6">{% include "rrhh/_campo.html" with campo=form.salida_nueva %}</div>
+      </div>
+      {% include "rrhh/_campo.html" with campo=form.motivo %}
+      {% include "rrhh/_campo.html" with campo=form.justificacion %}
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary"><i class="bi bi-save"></i> Guardar corrección</button>
+        <a href="{% url 'reporte_asistencia' %}" class="btn btn-outline-secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

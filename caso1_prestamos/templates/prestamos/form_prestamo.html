@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Nuevo préstamo{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <h1 class="h3 mb-3"><i class="bi bi-plus-circle"></i> Solicitud de préstamo</h1>
+
+    <div class="alert alert-light border small">
+      <i class="bi bi-info-circle"></i>
+      Reglas: máximo <strong>3 préstamos activos</strong> por docente, solo equipos
+      <strong>operativos</strong>, la cantidad no puede superar las unidades disponibles y la
+      devolución debe ser posterior al préstamo.
+    </div>
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}<div><i class="bi bi-x-octagon"></i> {{ error }}</div>{% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" class="card card-body" novalidate>
+      {% csrf_token %}
+      {% if form.docente %}{% include "prestamos/_campo.html" with campo=form.docente %}{% endif %}
+      {% include "prestamos/_campo.html" with campo=form.equipo %}
+      <div class="row">
+        <div class="col-md-4">{% include "prestamos/_campo.html" with campo=form.cantidad %}</div>
+        <div class="col-md-4">{% include "prestamos/_campo.html" with campo=form.fecha_prestamo %}</div>
+        <div class="col-md-4">{% include "prestamos/_campo.html" with campo=form.fecha_devolucion_prevista %}</div>
+      </div>
+      {% include "prestamos/_campo.html" with campo=form.observaciones %}
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> Registrar préstamo</button>
+        <a href="{% url 'prestamo_lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

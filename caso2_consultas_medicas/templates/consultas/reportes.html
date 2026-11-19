@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Reportes{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3"><i class="bi bi-bar-chart"></i> Estadísticas de atención</h1>
+<div class="row g-3 mb-3">
+  <div class="col-md-6"><div class="card card-body"><span class="text-secondary small">Citas registradas</span><span class="fs-3 fw-bold">{{ total_citas }}</span></div></div>
+  <div class="col-md-6"><div class="card card-body"><span class="text-secondary small">Tasa de cancelación</span><span class="fs-3 fw-bold">{{ tasa_cancelacion }}%</span></div></div>
+</div>
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card h-100"><div class="card-header bg-white fw-semibold"><i class="bi bi-diagram-3"></i> Citas por especialidad</div>
+      <ul class="list-group list-group-flush">
+        {% for e in por_especialidad %}<li class="list-group-item d-flex justify-content-between">{{ e.especialidad }}<span class="badge text-bg-primary">{{ e.total }}</span></li>{% endfor %}
+      </ul></div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card h-100"><div class="card-header bg-white fw-semibold"><i class="bi bi-award"></i> Médicos con más consultas</div>
+      <ol class="list-group list-group-flush list-group-numbered">
+        {% for m in top_medicos %}<li class="list-group-item d-flex justify-content-between">Dr(a). {{ m.apellidos }}<span class="badge text-bg-success">{{ m.consultas }}</span></li>{% endfor %}
+      </ol></div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card h-100"><div class="card-header bg-white fw-semibold"><i class="bi bi-people"></i> Pacientes frecuentes</div>
+      <ol class="list-group list-group-flush list-group-numbered">
+        {% for p in pacientes_frecuentes %}<li class="list-group-item d-flex justify-content-between">{{ p.nombre_completo }}<span class="badge text-bg-secondary">{{ p.num_citas }}</span></li>{% endfor %}
+      </ol></div>
+  </div>
+</div>
+{% endblock %}

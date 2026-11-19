@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Solicitar permiso{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <h1 class="h3 mb-3"><i class="bi bi-calendar-plus"></i> Solicitud de permiso</h1>
+    <div class="alert alert-light border small">
+      <i class="bi bi-info-circle"></i> Tienes <strong>{{ empleado.dias_vacaciones_disponibles }} días de vacaciones</strong> disponibles este año.
+      La solicitud queda <strong>pendiente</strong> hasta que tu jefe de área o RRHH la revise.
+    </div>
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">{% for e in form.non_field_errors %}<div><i class="bi bi-x-octagon"></i> {{ e }}</div>{% endfor %}</div>
+    {% endif %}
+    <form method="post" class="card card-body" novalidate>
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-md-4">{% include "rrhh/_campo.html" with campo=form.tipo %}</div>
+        <div class="col-md-4">{% include "rrhh/_campo.html" with campo=form.fecha_inicio %}</div>
+        <div class="col-md-4">{% include "rrhh/_campo.html" with campo=form.fecha_fin %}</div>
+      </div>
+      {% include "rrhh/_campo.html" with campo=form.motivo %}
+      {% include "rrhh/_campo.html" with campo=form.documento_adjunto %}
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary"><i class="bi bi-send"></i> Enviar solicitud</button>
+        <a href="{% url 'mis_permisos' %}" class="btn btn-outline-secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

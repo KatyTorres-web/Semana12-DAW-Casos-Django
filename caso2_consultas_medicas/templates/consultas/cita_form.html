@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Agendar cita{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <h1 class="h3 mb-3"><i class="bi bi-calendar-plus"></i> Agendar cita médica</h1>
+
+    <div class="alert alert-light border small">
+      <i class="bi bi-info-circle"></i> Horario del Centro Médico: lunes a viernes de 8:00 a 18:00 y sábados de 8:00 a 13:00.
+      Cada cita dura 30 minutos y un paciente solo puede tener una cita por día.
+    </div>
+
+    <form method="get" class="card card-body mb-3">
+      <label class="form-label fw-semibold" for="especialidad"><i class="bi bi-funnel"></i> 1. Filtrar médicos por especialidad</label>
+      <div class="d-flex gap-2">
+        <select name="especialidad" id="especialidad" class="form-select">
+          <option value="">Todas las especialidades</option>
+          {% for valor, etiqueta in especialidades %}
+            <option value="{{ valor }}" {% if valor == especialidad %}selected{% endif %}>{{ etiqueta }}</option>
+          {% endfor %}
+        </select>
+        <button class="btn btn-outline-primary text-nowrap">Aplicar</button>
+      </div>
+    </form>
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">{% for e in form.non_field_errors %}<div><i class="bi bi-x-octagon"></i> {{ e }}</div>{% endfor %}</div>
+    {% endif %}
+
+    <form method="post" class="card card-body" novalidate>
+      {% csrf_token %}
+      <p class="fw-semibold mb-2">2. Datos de la cita</p>
+      {% if form.paciente %}{% include "consultas/_campo.html" with campo=form.paciente %}{% endif %}
+      {% include "consultas/_campo.html" with campo=form.medico %}
+      {% include "consultas/_campo.html" with campo=form.fecha_hora %}
+      {% include "consultas/_campo.html" with campo=form.motivo %}
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check2-circle"></i> Agendar</button>
+        <a href="{% url 'cita_lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

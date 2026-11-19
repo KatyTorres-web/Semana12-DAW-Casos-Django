@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Reporte de asistencia{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+  <div>
+    <h1 class="h3 mb-1"><i class="bi bi-file-earmark-bar-graph"></i> Reporte de asistencia</h1>
+    <p class="text-secondary mb-0">{% if global %}Toda la empresa{% else %}Solo tu área{% endif %} &middot; jornada de 8 horas</p>
+  </div>
+  <form method="get" class="d-flex gap-2">
+    <input type="month" name="mes" value="{{ mes }}" class="form-control">
+    {% if global %}
+      <select name="area" class="form-select">
+        <option value="">Todas las áreas</option>
+        {% for a in areas %}<option value="{{ a.pk }}" {% if area == a.pk|stringformat:"s" %}selected{% endif %}>{{ a.nombre }}</option>{% endfor %}
+      </select>
+    {% endif %}
+    <button class="btn btn-outline-primary"><i class="bi bi-funnel"></i></button>
+    <a class="btn btn-outline-secondary text-nowrap" href="?mes={{ mes }}&area={{ area }}&formato=txt"><i class="bi bi-download"></i> Exportar</a>
+  </form>
+</div>
+
+<div class="card mb-4"><div class="table-responsive">
+  <table class="table table-hover mb-0">
+    <thead class="table-light"><tr><th>Empleado</th><th>Área</th><th class="text-center">Días</th><th class="text-end">Horas</th><th class="text-end">Horas extra</th><th class="text-center">Sin salida</th></tr></thead>
+    <tbody>
+      {% for f in resumen %}
+        <tr>
+          <td>{{ f.empleado.nombre_completo }}</td>
+          <td>{{ f.empleado.area }}</td>
+          <td class="text-center">{{ f.dias }}</td>
+          <td class="text-end">{{ f.horas }}</td>
+          <td class="text-end">{% if f.extra %}<span class="badge text-bg-primary">+{{ f.extra }} h</span>{% else %}-{% endif %}</td>
+          <td class="text-center">{% if f.sin_salida %}<span class="badge text-bg-warning">{{ f.sin_salida }}</span>{% else %}-{% endif %}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6" class="text-center text-secondary py-4">No hay registros en este periodo.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div></div>
+
+<h2 class="h5 mb-2">Detalle diario</h2>
+<div class="card"><div class="table-responsive">
+  <table class="table table-sm table-hover mb-0">
+    <thead class="table-light"><tr><th>Fecha</th><th>Empleado</th><th>Entrada</th><th>Salida</th><th class="text-end">Horas</th><th></th></tr></thead>
+    <tbody>
+      {% for r in registros %}
+        <tr>
+          <td>{{ r.fecha|date:"d/m/Y" }}</td>
+          <td>{{ r.empleado.nombre_completo }}</td>
+          <td>{{ r.hora_entrada|time:"H:i" }}</td>
+          <td>{{ r.hora_salida|time:"H:i"|default:"-" }}</td>
+          <td class="text-end">{{ r.horas_trabajadas|default:"-" }}{% if r.corregida %} <i class="bi bi-pencil-square text-secondary" title="Corregido"></i>{% endif %}</td>
+          <td class="text-end">{% if perms.rrhh.corregir_asistencia %}<a href="{% url 'asistencia_corregir' r.pk %}" class="btn btn-sm btn-outline-secondary" title="Corregir"><i class="bi bi-pencil"></i></a>{% endif %}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div></div>
+{% endblock %}

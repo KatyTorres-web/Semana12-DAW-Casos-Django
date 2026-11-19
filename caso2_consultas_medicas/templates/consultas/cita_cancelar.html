@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Cancelar cita{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card card-body">
+      <h1 class="h4 text-danger"><i class="bi bi-x-circle"></i> Cancelar cita</h1>
+      <p class="mb-3">
+        {{ cita.paciente.nombre_completo }} con Dr(a). {{ cita.medico.apellidos }}<br>
+        <span class="text-secondary">{{ cita.fecha_hora|date:"l d/m/Y \a \l\a\s H:i" }}</span>
+      </p>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% include "consultas/_campo.html" with campo=form.motivo %}
+        <div class="d-flex gap-2">
+          <button class="btn btn-danger"><i class="bi bi-x-circle"></i> Confirmar cancelación</button>
+          <a href="{% url 'cita_lista' %}" class="btn btn-outline-secondary">Volver</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
