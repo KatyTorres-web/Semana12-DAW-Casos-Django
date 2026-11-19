@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Acceso denegado{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6 text-center">
+    <div class="card card-body p-5">
+      <i class="bi bi-shield-x text-danger" style="font-size: 3rem;"></i>
+      <h1 class="h3 mt-3">Acceso denegado</h1>
+      <p class="text-secondary">{{ exception|default:"No tienes permiso para realizar esta acción." }}</p>
+      <p class="small text-secondary">Este intento quedó registrado en la auditoría del sistema.</p>
+      <a href="{% url 'catalogo' %}" class="btn btn-outline-primary"><i class="bi bi-arrow-left"></i> Volver al catálogo</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
