@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock %}
+{% block content %}
+{% if tipo == "paciente" %}
+  <h1 class="h3 mb-1"><i class="bi bi-person-heart"></i> Hola, {{ paciente.nombres }}</h1>
+  <p class="text-secondary">{{ paciente.get_tipo_display }} &middot; {{ paciente.codigo_uncp }} &middot; {{ paciente.edad }} años
+    {% if paciente.alergias %}&middot; <span class="text-danger"><i class="bi bi-exclamation-triangle"></i> Alergias: {{ paciente.alergias }}</span>{% endif %}</p>
+  <div class="d-flex gap-2 mb-3">
+    <a href="{% url 'cita_nueva' %}" class="btn btn-primary"><i class="bi bi-calendar-plus"></i> Agendar cita</a>
+    <a href="{% url 'historial_paciente' paciente.pk %}" class="btn btn-outline-secondary"><i class="bi bi-file-medical"></i> Mi historial</a>
+  </div>
+  <div class="card"><div class="card-header bg-white fw-semibold">Mis próximas citas</div>
+    {% include "consultas/_tabla_citas.html" with mostrar_medico=True %}
+  </div>
+{% elif tipo == "medico" %}
+  <h1 class="h3 mb-1"><i class="bi bi-calendar-day"></i> Agenda de hoy, {{ hoy|date:"l d/m/Y" }}</h1>
+  <p class="text-secondary">Dr(a). {{ medico.nombres }} {{ medico.apellidos }} &middot; {{ medico.get_especialidad_display }} &middot; Consultorio {{ medico.consultorio }} &middot; {{ medico.horario }}</p>
+  <div class="card">{% include "consultas/_tabla_citas.html" with mostrar_paciente=True %}</div>
+{% else %}
+  <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+    <h1 class="h3 mb-0"><i class="bi bi-calendar-day"></i> Agenda general de hoy, {{ hoy|date:"d/m/Y" }}</h1>
+    <div class="d-flex gap-2">
+      {% if perms.consultas.agendar_cita %}<a href="{% url 'cita_nueva' %}" class="btn btn-primary"><i class="bi bi-calendar-plus"></i> Agendar cita</a>{% endif %}
+      {% if perms.consultas.add_paciente %}<a href="{% url 'paciente_nuevo' %}" class="btn btn-outline-primary"><i class="bi bi-person-plus"></i> Nuevo paciente</a>{% endif %}
+    </div>
+  </div>
+  <div class="card">{% include "consultas/_tabla_citas.html" with mostrar_paciente=True mostrar_medico=True %}</div>
+{% endif %}
+{% endblock %}

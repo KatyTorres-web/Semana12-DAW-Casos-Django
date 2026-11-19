@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Registrar consulta{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <h1 class="h3 mb-3"><i class="bi bi-clipboard2-pulse"></i> Registro de consulta médica</h1>
+    <div class="card card-body mb-3 small">
+      <div class="row">
+        <div class="col-sm-6"><span class="text-secondary">Paciente</span><br><strong>{{ cita.paciente.nombre_completo }}</strong> ({{ cita.paciente.edad }} años)</div>
+        <div class="col-sm-6"><span class="text-secondary">Fecha</span><br>{{ cita.fecha_hora|date:"d/m/Y H:i" }}</div>
+        <div class="col-12 mt-2"><span class="text-secondary">Motivo</span><br>{{ cita.motivo }}</div>
+        {% if cita.paciente.alergias %}<div class="col-12 mt-2 text-danger"><i class="bi bi-exclamation-triangle"></i> Alergias: {{ cita.paciente.alergias }}</div>{% endif %}
+      </div>
+    </div>
+    <div class="alert alert-warning small"><i class="bi bi-lock"></i> Una vez guardada, la consulta no se puede modificar: solo se podrán agregar notas.</div>
+    <form method="post" class="card card-body" novalidate>
+      {% csrf_token %}
+      {% include "consultas/_campo.html" with campo=form.diagnostico %}
+      {% include "consultas/_campo.html" with campo=form.tratamiento %}
+      {% include "consultas/_campo.html" with campo=form.medicamentos %}
+      <div class="row">
+        <div class="col-md-5">{% include "consultas/_campo.html" with campo=form.proxima_cita %}</div>
+        <div class="col-md-7">{% include "consultas/_campo.html" with campo=form.archivos_adjuntos %}</div>
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-success"><i class="bi bi-save"></i> Guardar consulta</button>
+        <a href="{% url 'panel' %}" class="btn btn-outline-secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
